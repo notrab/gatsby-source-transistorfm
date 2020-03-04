@@ -53,6 +53,7 @@ exports.onCreateNode = async ({
   store,
   cache,
   createNodeId,
+  reporter,
 }) => {
   const { createNode } = actions;
 
