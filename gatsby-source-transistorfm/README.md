@@ -4,8 +4,6 @@
 
 ## Install
 
-PS. Not actually on NPM yet
-
 ```bash
 yarn add gatsby-source-transistorfm
 ```
