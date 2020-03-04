@@ -2,7 +2,7 @@ const Parser = require('rss-parser');
 const { createRemoteFileNode } = require('gatsby-source-filesystem');
 
 exports.sourceNodes = async (
-  { actions, createNodeId, createContentDigest, reporter },
+  { actions, cache, createNodeId, createContentDigest, reporter, store },
   { url }
 ) => {
   if (!url)
@@ -22,7 +22,7 @@ exports.sourceNodes = async (
 
   const parser = new Parser();
 
-  const { items, ...store } = await parser.parseURL(feed);
+  const { items, image, ...show } = await parser.parseURL(feed);
 
   items.forEach(item => {
     const nodeId = createNodeId(item.link);
@@ -37,43 +37,32 @@ exports.sourceNodes = async (
     });
   });
 
-  await createNode({
-    ...store,
-    id: url,
-    internal: {
-      type: `TransistorShow`,
-      contentDigest: createContentDigest(store),
-    },
-  });
-};
-
-exports.onCreateNode = async ({
-  node,
-  actions,
-  store,
-  cache,
-  createNodeId,
-  reporter,
-}) => {
-  const { createNode } = actions;
-
-  if (node.internal.type === 'TransistorShow' && node.image) {
+  if (image && image.url) {
     let imageNode;
 
     try {
-      imageNode = await createRemoteFileNode({
-        url: node.image.url,
+      const { id } = await createRemoteFileNode({
+        url: image.url,
+        parentNodeId: show.id,
         store,
         cache,
         createNode,
         createNodeId,
       });
+
+      imageNode = id;
     } catch (err) {
-      reporter.error('gatsby-source-transistorfm', e);
+      reporter.error('gatsby-source-transistorfm', err);
     }
 
-    if (imageNode) {
-      node.image___NODE = imageNode.id;
-    }
+    await createNode({
+      ...show,
+      id: url,
+      image___NODE: imageNode,
+      internal: {
+        type: `TransistorShow`,
+        contentDigest: createContentDigest(show),
+      },
+    });
   }
 };
