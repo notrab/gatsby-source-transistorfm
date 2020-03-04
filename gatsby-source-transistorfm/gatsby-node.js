@@ -1,35 +1,39 @@
-const Parser = require("rss-parser");
-const { createRemoteFileNode } = require("gatsby-source-filesystem");
+const Parser = require('rss-parser');
+const { createRemoteFileNode } = require('gatsby-source-filesystem');
 
 exports.sourceNodes = async (
-  { actions, createNodeId, createContentDigest },
+  { actions, createNodeId, createContentDigest, reporter },
   { url }
 ) => {
+  if (!url)
+    return reporter.panicOnBuild(
+      'gatsby-source-transistorfm: You must provide a url for your feed'
+    );
+
+  let feed;
+
+  if (url.includes('http')) {
+    feed = url;
+  } else {
+    feed = `https://feeds.transistor.fm/${url}`;
+  }
+
   const { createNode } = actions;
 
   const parser = new Parser();
 
-  const { items, ...store } = await parser.parseURL(url);
+  const { items, ...store } = await parser.parseURL(feed);
 
   items.forEach(item => {
     const nodeId = createNodeId(item.link);
-
-    // let imageHref;
-
-    // if (image) {
-    //   const { url } = image;
-    //   imageHref = url;
-    // }
-
-    // We should probably create a parent for the show, providing the image, title, description there
 
     createNode({
       ...item,
       id: nodeId,
       internal: {
         contentDigest: createContentDigest(item),
-        type: `TransistorEpisode`
-      }
+        type: `TransistorEpisode`,
+      },
     });
   });
 
@@ -38,8 +42,8 @@ exports.sourceNodes = async (
     id: url,
     internal: {
       type: `TransistorShow`,
-      contentDigest: createContentDigest(store)
-    }
+      contentDigest: createContentDigest(store),
+    },
   });
 };
 
@@ -48,11 +52,11 @@ exports.onCreateNode = async ({
   actions,
   store,
   cache,
-  createNodeId
+  createNodeId,
 }) => {
   const { createNode } = actions;
 
-  if (node.internal.type === "TransistorShow" && node.image) {
+  if (node.internal.type === 'TransistorShow' && node.image) {
     let imageNode;
 
     try {
@@ -61,10 +65,10 @@ exports.onCreateNode = async ({
         store,
         cache,
         createNode,
-        createNodeId
+        createNodeId,
       });
     } catch (err) {
-      console.error("gatsby-source-transistorfm: ERROR", e);
+      reporter.error('gatsby-source-transistorfm', e);
     }
 
     if (imageNode) {

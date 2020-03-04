@@ -1,5 +1,7 @@
 # gatsby-source-transistorfm
 
+🎙 Gatsby source plugin for fetching show and episode data from [Transistor](https://transistor.fm).
+
 ## Install
 
 PS. Not actually on NPM yet
@@ -14,10 +16,10 @@ yarn add gatsby-source-transistorfm
 // In your gatsby-config.js
 plugins: [
   {
-    resolve: "gatsby-source-transistorfm",
+    resolve: 'gatsby-source-transistorfm',
     options: {
-      url: "..."
-    }
-  }
+      url: '...',
+    },
+  },
 ];
 ```
