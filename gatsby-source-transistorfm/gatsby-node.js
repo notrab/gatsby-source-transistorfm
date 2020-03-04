@@ -9,9 +9,7 @@ exports.sourceNodes = async (
 
   const parser = new Parser();
 
-  const { title, description, image, copyright, items } = await parser.parseURL(
-    url
-  );
+  const { items, ...store } = await parser.parseURL(url);
 
   items.forEach(item => {
     const nodeId = createNodeId(item.link);
@@ -27,16 +25,21 @@ exports.sourceNodes = async (
 
     createNode({
       ...item,
-      image,
-      copyright,
       id: nodeId,
-      parent: null,
-      children: [],
       internal: {
         contentDigest: createContentDigest(item),
         type: `TransistorEpisode`
       }
     });
+  });
+
+  await createNode({
+    ...store,
+    id: url,
+    internal: {
+      type: `TransistorShow`,
+      contentDigest: createContentDigest(store)
+    }
   });
 };
 
@@ -49,7 +52,7 @@ exports.onCreateNode = async ({
 }) => {
   const { createNode } = actions;
 
-  if (node.internal.type === "TransistorEpisode" && node.image) {
+  if (node.internal.type === "TransistorShow" && node.image) {
     let imageNode;
 
     try {
