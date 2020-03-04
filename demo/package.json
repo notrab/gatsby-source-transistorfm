@@ -11,6 +11,7 @@
     "gatsby": "2.19.28",
     "gatsby-source-transistorfm": "*",
     "react": "16.13.0",
+    "react-audio-player": "0.11.1",
     "react-dom": "16.13.0"
   },
   "devDependencies": {
