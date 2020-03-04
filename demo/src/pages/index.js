@@ -32,7 +32,7 @@ const IndexPage = () => {
   return (
     <React.Fragment>
       <h1>{show.title}</h1>
-      <p>{show.descriptioon}</p>
+      <p>{show.description}</p>
 
       <hr />
 
