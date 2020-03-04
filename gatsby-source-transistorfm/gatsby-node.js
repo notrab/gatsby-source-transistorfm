@@ -26,8 +26,6 @@ exports.sourceNodes = async (
     createNode({
       ...item,
       id: nodeId,
-      parent: null,
-
       internal: {
         contentDigest: createContentDigest(item),
         type: `TransistorEpisode`
