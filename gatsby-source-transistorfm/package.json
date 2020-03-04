@@ -1,0 +1,13 @@
+{
+  "name": "gatsby-source-transistorfm",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "description": "Source transistor podcast info",
+  "devDependencies": {
+    "rss-parser": "3.7.5"
+  },
+  "dependencies": {
+    "gatsby-source-filesystem": "2.1.48"
+  }
+}

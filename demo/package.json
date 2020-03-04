@@ -1,0 +1,17 @@
+{
+  "name": "demo",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "gatsby build",
+    "clean": "gatsby clean",
+    "dev": "gatsby develop",
+    "predev": "yarn clean"
+  },
+  "dependencies": {
+    "gatsby": "2.19.28",
+    "gatsby-source-transistorfm": "*",
+    "react": "16.13.0",
+    "react-dom": "16.13.0"
+  }
+}

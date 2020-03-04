@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "workspaces": [
+    "demo",
+    "gatsby-source-transistorfm"
+  ],
+  "scripts": {
+    "build": "yarn workspace demo build",
+    "dev": "yarn workspace demo dev"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "devDependencies": {
+    "prettier": "1.18.2"
+  }
+}
