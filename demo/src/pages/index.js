@@ -7,8 +7,8 @@ const pageQuery = graphql`
   {
     show: transistorShow {
       id
-      description
       title
+      description
       image {
         childImageSharp {
           fluid(maxWidth: 560) {
@@ -53,7 +53,11 @@ const IndexPage = () => {
         <article key={episode.id}>
           <h2>{episode.title}</h2>
           <p>{episode.content}</p>
-          <ReactAudioPlayer src={episode.enclosure.url} controls />
+          <ReactAudioPlayer
+            src={episode.enclosure.url}
+            controls
+            preload="none"
+          />
         </article>
       ))}
     </React.Fragment>
