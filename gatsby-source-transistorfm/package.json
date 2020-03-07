@@ -4,6 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "description": "Source transistor podcast info",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "transistorfm"
+  ],
   "dependencies": {
     "gatsby-source-filesystem": "2.1.48",
     "rss-parser": "3.7.5"
