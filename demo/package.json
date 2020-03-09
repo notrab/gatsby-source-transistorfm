@@ -8,7 +8,7 @@
     "dev": "gatsby develop"
   },
   "dependencies": {
-    "gatsby": "2.19.28",
+    "gatsby": "2.19.32",
     "gatsby-image": "2.2.43",
     "gatsby-plugin-sharp": "2.4.7",
     "gatsby-source-transistorfm": "*",
