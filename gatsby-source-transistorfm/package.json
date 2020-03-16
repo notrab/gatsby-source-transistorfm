@@ -10,7 +10,7 @@
     "transistorfm"
   ],
   "dependencies": {
-    "gatsby-source-filesystem": "2.1.50",
+    "gatsby-source-filesystem": "2.1.55",
     "rss-parser": "3.7.5"
   }
 }
