@@ -24,6 +24,9 @@ exports.sourceNodes = async (
 
   const { items, image, ...show } = await parser.parseURL(feed);
 
+  const imageUrl = image && image.url;
+  console.log({ imageUrl });
+
   items.forEach(item => {
     const nodeId = createNodeId(item.link);
 
@@ -37,32 +40,43 @@ exports.sourceNodes = async (
     });
   });
 
-  if (image && image.url) {
+  await createNode({
+    ...show,
+    id: url,
+    imageUrl,
+    internal: {
+      type: `TransistorShow`,
+      contentDigest: createContentDigest(show),
+    },
+  });
+};
+
+exports.onCreateNode = async ({
+  node,
+  actions,
+  store,
+  cache,
+  createNodeId,
+}) => {
+  const { createNode } = actions;
+
+  if (node.internal.type === `TransistorShow` && node.imageUrl) {
     let imageNode;
 
     try {
       const { id } = await createRemoteFileNode({
-        url: image.url,
-        parentNodeId: show.id,
+        url: node.imageUrl,
+        parentNodeId: node.id,
         store,
         cache,
         createNode,
         createNodeId,
       });
-
       imageNode = id;
     } catch (err) {
       reporter.error('gatsby-source-transistorfm', err);
     }
 
-    await createNode({
-      ...show,
-      id: url,
-      image___NODE: imageNode,
-      internal: {
-        type: `TransistorShow`,
-        contentDigest: createContentDigest(show),
-      },
-    });
+    node.image___NODE = imageNode;
   }
 };

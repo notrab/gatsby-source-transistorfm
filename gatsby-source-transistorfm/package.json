@@ -7,7 +7,8 @@
   "keywords": [
     "gatsby",
     "gatsby-plugin",
-    "transistorfm"
+    "transistorfm",
+    "podcast"
   ],
   "dependencies": {
     "gatsby-source-filesystem": "2.2.2",
