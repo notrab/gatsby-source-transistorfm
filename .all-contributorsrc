@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "notrab",
+      "name": "Jamie Barton",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/950181?v=4",
+      "profile": "https://cartql.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "gatsby-source-transistorfm",
+  "projectOwner": "notrab",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
