@@ -9,12 +9,17 @@
     "clean": "yarn workspace demo clean",
     "dev": "yarn workspace demo dev"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
-  },
-  "devDependencies": {
-    "prettier": "2.0.3"
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/npm",
+        {
+          "pkgRoot": "packages/gatsby-theme-chec"
+        }
+      ],
+      "@semantic-release/github"
+    ]
   }
 }
