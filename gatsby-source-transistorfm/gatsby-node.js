@@ -25,12 +25,11 @@ exports.sourceNodes = async (
   const { items, image, ...show } = await parser.parseURL(feed);
 
   const imageUrl = image && image.url;
-  console.log({ imageUrl });
 
-  items.forEach(item => {
+  items.forEach(async item => {
     const nodeId = createNodeId(item.link);
 
-    createNode({
+    await createNode({
       ...item,
       id: nodeId,
       internal: {
@@ -59,6 +58,25 @@ exports.onCreateNode = async ({
   createNodeId,
 }) => {
   const { createNode } = actions;
+  if (node.internal.type === `TransistorEpisode` && node.itunes.image) {
+    let imageNode;
+
+    try {
+      const { id } = await createRemoteFileNode({
+        url: node.itunes.image,
+        parentNodeId: node.id,
+        store,
+        cache,
+        createNode,
+        createNodeId,
+      });
+      imageNode = id;
+    } catch (err) {
+      reporter.error('gatsby-source-transistorfm', err);
+    }
+
+    node.image___NODE = imageNode;
+  }
 
   if (node.internal.type === `TransistorShow` && node.imageUrl) {
     let imageNode;
