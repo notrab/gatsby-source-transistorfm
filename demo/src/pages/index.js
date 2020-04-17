@@ -26,6 +26,13 @@ const pageQuery = graphql`
         enclosure {
           url
         }
+        image {
+          childImageSharp {
+            fluid(maxWidth: 560) {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
       }
     }
   }
@@ -51,6 +58,10 @@ const IndexPage = () => {
 
       {episodes.map(episode => (
         <article key={episode.id}>
+          <Img
+            fluid={episode.image.childImageSharp.fluid}
+            style={{ width: '260px' }}
+          />
           <h2>{episode.title}</h2>
           <p>{episode.content}</p>
           <ReactAudioPlayer
