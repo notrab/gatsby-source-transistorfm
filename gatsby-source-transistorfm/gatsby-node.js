@@ -59,6 +59,25 @@ exports.onCreateNode = async ({
   createNodeId,
 }) => {
   const { createNode } = actions;
+  if (node.internal.type === `TransistorEpisode` && node.itunes.image) {
+    let imageNode;
+
+    try {
+      const { id } = await createRemoteFileNode({
+        url: node.itunes.image,
+        parentNodeId: node.id,
+        store,
+        cache,
+        createNode,
+        createNodeId,
+      });
+      imageNode = id;
+    } catch (err) {
+      reporter.error('gatsby-source-transistorfm', err);
+    }
+
+    node.image___NODE = imageNode;
+  }
 
   if (node.internal.type === `TransistorShow` && node.imageUrl) {
     let imageNode;
