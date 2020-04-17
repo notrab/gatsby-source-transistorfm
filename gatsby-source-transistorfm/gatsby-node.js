@@ -26,10 +26,10 @@ exports.sourceNodes = async (
 
   const imageUrl = image && image.url;
 
-  items.forEach(item => {
+  items.forEach(async item => {
     const nodeId = createNodeId(item.link);
 
-    createNode({
+    await createNode({
       ...item,
       id: nodeId,
       internal: {
