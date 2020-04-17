@@ -25,7 +25,6 @@ exports.sourceNodes = async (
   const { items, image, ...show } = await parser.parseURL(feed);
 
   const imageUrl = image && image.url;
-  console.log({ imageUrl });
 
   items.forEach(item => {
     const nodeId = createNodeId(item.link);
