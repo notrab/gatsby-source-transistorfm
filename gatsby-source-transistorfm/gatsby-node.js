@@ -2,7 +2,7 @@ const Parser = require('rss-parser');
 const { createRemoteFileNode } = require('gatsby-source-filesystem');
 
 exports.sourceNodes = async (
-  { actions, cache, createNodeId, createContentDigest, reporter, store },
+  { actions: { createNode }, createNodeId, createContentDigest, reporter },
   { url }
 ) => {
   if (!url)
@@ -18,36 +18,36 @@ exports.sourceNodes = async (
     feed = `https://feeds.transistor.fm/${url}`;
   }
 
-  const { createNode } = actions;
-
   const parser = new Parser();
 
-  const { items, image, ...show } = await parser.parseURL(feed);
+  const { items: episodes, ...show } = await parser.parseURL(feed);
 
-  const imageUrl = image && image.url;
-
-  items.forEach(async item => {
-    const nodeId = createNodeId(item.link);
-
+  const processEpisode = async episode => {
     await createNode({
-      ...item,
-      id: nodeId,
+      ...episode,
+      id: createNodeId(episode.guid),
       internal: {
-        contentDigest: createContentDigest(item),
+        contentDigest: createContentDigest(episode),
         type: `TransistorEpisode`,
       },
     });
-  });
+  };
 
-  await createNode({
-    ...show,
-    id: url,
-    imageUrl,
-    internal: {
-      type: `TransistorShow`,
-      contentDigest: createContentDigest(show),
-    },
-  });
+  const processShow = async show => {
+    await createNode({
+      ...show,
+      id: createNodeId(show.feedUrl),
+      internal: {
+        contentDigest: createContentDigest(show),
+        type: `TransistorShow`,
+      },
+    });
+  };
+
+  await Promise.all([
+    processShow(show),
+    episodes.map(async episode => processEpisode(episode)),
+  ]);
 };
 
 exports.onCreateNode = async ({
@@ -56,6 +56,7 @@ exports.onCreateNode = async ({
   store,
   cache,
   createNodeId,
+  reporter,
 }) => {
   const { createNode } = actions;
   if (node.internal.type === `TransistorEpisode` && node.itunes.image) {
@@ -78,12 +79,12 @@ exports.onCreateNode = async ({
     node.image___NODE = imageNode;
   }
 
-  if (node.internal.type === `TransistorShow` && node.imageUrl) {
+  if (node.internal.type === `TransistorShow` && node.image && node.image.url) {
     let imageNode;
 
     try {
       const { id } = await createRemoteFileNode({
-        url: node.imageUrl,
+        url: node.image.url,
         parentNodeId: node.id,
         store,
         cache,
