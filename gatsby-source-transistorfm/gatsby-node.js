@@ -22,10 +22,11 @@ exports.sourceNodes = async (
 
   const { items: episodes, ...show } = await parser.parseURL(feed);
 
-  const processEpisode = async episode => {
+  const processEpisode = async ({ episode, show }) => {
     await createNode({
       ...episode,
       id: createNodeId(episode.guid),
+      show___NODE: createNodeId(show.feedUrl),
       internal: {
         contentDigest: createContentDigest(episode),
         type: `TransistorEpisode`,
@@ -33,10 +34,11 @@ exports.sourceNodes = async (
     });
   };
 
-  const processShow = async show => {
+  const processShow = async ({ show, episodes }) => {
     await createNode({
       ...show,
       id: createNodeId(show.feedUrl),
+      episodes___NODE: episodes.map(episode => createNodeId(episode.guid)),
       internal: {
         contentDigest: createContentDigest(show),
         type: `TransistorShow`,
@@ -45,8 +47,8 @@ exports.sourceNodes = async (
   };
 
   await Promise.all([
-    processShow(show),
-    episodes.map(async episode => processEpisode(episode)),
+    processShow({ show, episodes }),
+    episodes.map(async episode => processEpisode({ episode, show })),
   ]);
 };
 
