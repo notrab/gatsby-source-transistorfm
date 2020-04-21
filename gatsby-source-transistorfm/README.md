@@ -22,6 +22,8 @@ plugins: [
 ];
 ```
 
+To use multiple Transistor feeds, just add another instance of the plugin configuration to `gatsby-config.js`.
+
 ### Example
 
 ```js
@@ -37,6 +39,21 @@ const pageQuery = graphql`
       id
       title
       description
+      episodes {
+        id
+        title
+        content
+        enclosure {
+          url
+        }
+        image {
+          childImageSharp {
+            fluid(maxWidth: 560) {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
+      }
       image {
         childImageSharp {
           fluid(maxWidth: 560) {
@@ -45,25 +62,11 @@ const pageQuery = graphql`
         }
       }
     }
-
-    episodes: allTransistorEpisode {
-      nodes {
-        id
-        title
-        content
-        enclosure {
-          url
-        }
-      }
-    }
   }
 `;
 
 const IndexPage = () => {
-  const {
-    show,
-    episodes: { nodes: episodes },
-  } = useStaticQuery(pageQuery);
+  const { show } = useStaticQuery(pageQuery);
 
   return (
     <React.Fragment>
@@ -77,7 +80,7 @@ const IndexPage = () => {
 
       <hr />
 
-      {episodes.map(episode => (
+      {show.episodes.map(episode => (
         <article key={episode.id}>
           <h2>{episode.title}</h2>
           <p>{episode.content}</p>
