@@ -9,17 +9,7 @@ const pageQuery = graphql`
       id
       title
       description
-      image {
-        childImageSharp {
-          fluid(maxWidth: 560) {
-            ...GatsbyImageSharpFluid
-          }
-        }
-      }
-    }
-
-    episodes: allTransistorEpisode {
-      nodes {
+      episodes {
         id
         title
         content
@@ -34,15 +24,19 @@ const pageQuery = graphql`
           }
         }
       }
+      image {
+        childImageSharp {
+          fluid(maxWidth: 560) {
+            ...GatsbyImageSharpFluid
+          }
+        }
+      }
     }
   }
 `;
 
 const IndexPage = () => {
-  const {
-    show,
-    episodes: { nodes: episodes },
-  } = useStaticQuery(pageQuery);
+  const { show } = useStaticQuery(pageQuery);
 
   return (
     <React.Fragment>
@@ -56,7 +50,7 @@ const IndexPage = () => {
 
       <hr />
 
-      {episodes.map(episode => (
+      {show.episodes.map(episode => (
         <article key={episode.id}>
           <Img
             fluid={episode.image.childImageSharp.fluid}
