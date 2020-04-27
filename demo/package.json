@@ -8,11 +8,11 @@
     "dev": "gatsby develop"
   },
   "dependencies": {
-    "gatsby": "2.20.25",
-    "gatsby-image": "2.3.4",
-    "gatsby-plugin-sharp": "2.5.6",
+    "gatsby": "2.20.36",
+    "gatsby-image": "2.3.5",
+    "gatsby-plugin-sharp": "2.5.7",
     "gatsby-source-transistorfm": "*",
-    "gatsby-transformer-sharp": "2.4.6",
+    "gatsby-transformer-sharp": "2.4.7",
     "react": "16.13.1",
     "react-audio-player": "0.13.0",
     "react-dom": "16.13.1"
