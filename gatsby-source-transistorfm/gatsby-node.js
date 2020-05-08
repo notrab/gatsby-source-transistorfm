@@ -35,8 +35,12 @@ exports.sourceNodes = async (
   };
 
   const processShow = async ({ show, episodes }) => {
+    const { image, ...rest } = show;
+    const imageUrl = image && image.url;
+
     await createNode({
-      ...show,
+      ...rest,
+      imageUrl,
       id: createNodeId(show.feedUrl),
       episodes___NODE: episodes.map(episode => createNodeId(episode.guid)),
       internal: {
@@ -81,12 +85,12 @@ exports.onCreateNode = async ({
     node.image___NODE = imageNode;
   }
 
-  if (node.internal.type === `TransistorShow` && node.image && node.image.url) {
+  if (node.internal.type === `TransistorShow` && node.imageUrl) {
     let imageNode;
 
     try {
       const { id } = await createRemoteFileNode({
-        url: node.image.url,
+        url: node.imageUrl,
         parentNodeId: node.id,
         store,
         cache,
