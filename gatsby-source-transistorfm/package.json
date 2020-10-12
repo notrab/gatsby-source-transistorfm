@@ -11,7 +11,7 @@
     "podcast"
   ],
   "dependencies": {
-    "gatsby-source-filesystem": "2.3.32",
+    "gatsby-source-filesystem": "2.3.34",
     "rss-parser": "3.9.0"
   }
 }
