@@ -13,9 +13,9 @@
     "gatsby-plugin-sharp": "2.6.42",
     "gatsby-source-transistorfm": "*",
     "gatsby-transformer-sharp": "2.5.18",
-    "react": "16.13.1",
+    "react": "16.14.0",
     "react-audio-player": "0.14.0",
-    "react-dom": "16.13.1"
+    "react-dom": "16.14.0"
   },
   "devDependencies": {
     "dotenv": "8.2.0"
