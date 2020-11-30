@@ -8,9 +8,9 @@
     "dev": "gatsby develop"
   },
   "dependencies": {
-    "gatsby": "2.27.0",
+    "gatsby": "2.27.4",
     "gatsby-image": "2.6.0",
-    "gatsby-plugin-sharp": "2.9.0",
+    "gatsby-plugin-sharp": "2.9.1",
     "gatsby-source-transistorfm": "*",
     "gatsby-transformer-sharp": "2.7.0",
     "react": "16.14.0",
