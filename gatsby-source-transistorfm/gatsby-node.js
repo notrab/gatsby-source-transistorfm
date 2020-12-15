@@ -1,32 +1,110 @@
+const axios = require('axios').default;
 const Parser = require('rss-parser');
 const { createRemoteFileNode } = require('gatsby-source-filesystem');
 
 exports.sourceNodes = async (
   { actions: { createNode }, createNodeId, createContentDigest, reporter },
-  { url }
+  { apiKey }
 ) => {
-  if (!url)
+  if (!apiKey)
     return reporter.panicOnBuild(
-      'gatsby-source-transistorfm: You must provide a url for your feed'
+      'gatsby-source-transistorfm: You must provide an apiKey for your feed'
     );
 
-  let feed;
+  /**
+   * Handle get requests
+   */
+  const apiBase = 'https://api.transistor.fm/v1';
+  const createGetRequest = async (path, params) => {
+    return await axios.get(`${apiBase}${path}`, {
+      ...params,
+      headers: {
+        'x-api-key': apiKey,
+      },
+    });
+  };
 
-  if (url.includes('http')) {
-    feed = url;
-  } else {
-    feed = `https://feeds.transistor.fm/${url}`;
-  }
+  const getShows = async () => {
+    const activity = reporter.activityTimer(
+      `fetching all Show Nodes from Transistor FM`,
+      {}
+    );
+    activity.start();
+    try {
+      const {
+        data: { data },
+      } = await createGetRequest('/shows', {});
+      activity.end();
+      return data;
+    } catch (error) {
+      console.error(error);
+      activity.end();
+      return [];
+    }
+  };
 
-  const parser = new Parser();
+  const getEpisodes = async (page = 1, perPage = 10) => {
+    try {
+      const { data } = await createGetRequest(
+        `/episodes?pagination[page]=${page}&pagination[per]=${perPage}`
+      );
+      return data;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
 
-  const { items: episodes, ...show } = await parser.parseURL(feed);
+  const getAllEpisodes = async () => {
+    const activity = reporter.activityTimer(
+      `fetching all Episode Nodes from Transistor FM`,
+      {}
+    );
+    activity.start();
+    const nodes = [];
+    let fetchNodes = true;
+    let fetchNodesLoop = 1;
+    const nodesPerPage = 20;
+    while (fetchNodes) {
+      try {
+        activity.setStatus(`Getting page ${fetchNodesLoop} of Episodes`);
+        const episodeNodes = await getEpisodes(fetchNodesLoop, nodesPerPage);
 
-  const processEpisode = async ({ episode, show }) => {
+        // Process nodes, if we have any
+        if (episodeNodes.data && episodeNodes.data.length > 0) {
+          episodeNodes.data.forEach((epNode) => {
+            nodes.push(epNode);
+          });
+        } else {
+          // stop the loop if we run out of nodes
+          fetchNodes = false;
+        }
+      } catch (error) {
+        reporter.panic(`Error getting Episodes from Transistor FM`, error);
+        throw Error(`Error getting Episodes from Transistor FM`);
+      }
+
+      fetchNodesLoop++;
+    }
+    activity.end();
+    return nodes;
+  };
+
+  const shows = await getShows();
+  const allEpisodes = await getAllEpisodes();
+
+  /**
+   * Gatsby processes
+   */
+  const processEpisode = async ({ episode }) => {
+    const { id, attributes } = episode;
     await createNode({
       ...episode,
-      id: createNodeId(episode.guid),
-      show___NODE: createNodeId(show.feedUrl),
+      id: createNodeId(id),
+      attributes: {
+        ...attributes,
+        id,
+      },
       internal: {
         contentDigest: createContentDigest(episode),
         type: `TransistorEpisode`,
@@ -34,15 +112,15 @@ exports.sourceNodes = async (
     });
   };
 
-  const processShow = async ({ show, episodes }) => {
-    const { image, ...rest } = show;
-    const imageUrl = image && image.url;
-
+  const processShow = async ({ show }) => {
+    const { id, attributes } = show;
     await createNode({
-      ...rest,
-      imageUrl,
-      id: createNodeId(show.feedUrl),
-      episodes___NODE: episodes.map(episode => createNodeId(episode.guid)),
+      ...show,
+      id: createNodeId(id),
+      attributes: {
+        ...attributes,
+        id
+      },
       internal: {
         contentDigest: createContentDigest(show),
         type: `TransistorShow`,
@@ -51,11 +129,16 @@ exports.sourceNodes = async (
   };
 
   await Promise.all([
-    processShow({ show, episodes }),
-    episodes.map(async episode => processEpisode({ episode, show })),
+    shows.map(async (show) => processShow({ show })),
+    allEpisodes.map(async (episode) => processEpisode({ episode })),
   ]);
 };
 
+
+/**
+ * 
+ * Handle show image
+ */
 exports.onCreateNode = async ({
   node,
   actions,
@@ -64,33 +147,12 @@ exports.onCreateNode = async ({
   createNodeId,
   reporter,
 }) => {
-  const { createNode } = actions;
-  if (node.internal.type === `TransistorEpisode` && node.itunes.image) {
+  if (node.internal.type === `TransistorShow` && node.attributes.image_url) {
+    const { createNode } = actions;
     let imageNode;
-
     try {
       const { id } = await createRemoteFileNode({
-        url: node.itunes.image,
-        parentNodeId: node.id,
-        store,
-        cache,
-        createNode,
-        createNodeId,
-      });
-      imageNode = id;
-    } catch (err) {
-      reporter.error('gatsby-source-transistorfm', err);
-    }
-
-    node.image___NODE = imageNode;
-  }
-
-  if (node.internal.type === `TransistorShow` && node.imageUrl) {
-    let imageNode;
-
-    try {
-      const { id } = await createRemoteFileNode({
-        url: node.imageUrl,
+        url: node.attributes.image_url,
         parentNodeId: node.id,
         store,
         cache,

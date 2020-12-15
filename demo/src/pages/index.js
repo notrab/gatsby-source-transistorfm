@@ -5,16 +5,15 @@ import ReactAudioPlayer from 'react-audio-player';
 
 const pageQuery = graphql`
   {
-    show: transistorShow {
-      id
-      title
-      description
-      episodes {
+    shows: allTransistorShow {
+      nodes {
         id
-        title
-        content
-        enclosure {
-          url
+        attributes {
+          title
+          category
+          copyright
+          description
+          image_url
         }
         image {
           childImageSharp {
@@ -23,12 +22,25 @@ const pageQuery = graphql`
             }
           }
         }
-      }
-      image {
-        childImageSharp {
-          fluid(maxWidth: 560) {
-            ...GatsbyImageSharpFluid
+        relationships {
+          episodes {
+            data {
+              id
+            }
           }
+        }
+      }
+    }
+    episodes: allTransistorEpisode {
+      nodes {
+        id
+        attributes {
+          id
+          formatted_summary
+          media_url
+          number
+          season
+          title
         }
       }
     }
@@ -36,35 +48,43 @@ const pageQuery = graphql`
 `;
 
 const IndexPage = () => {
-  const { show } = useStaticQuery(pageQuery);
-
+  const { shows, episodes } = useStaticQuery(pageQuery);
   return (
     <React.Fragment>
-      <h1>{show.title}</h1>
-      <p>{show.description}</p>
+      {shows.nodes.map((show) => {
+        const { attributes: showAttributes, relationships } = show;
+        return (
+          <React.Fragment key={show.id}>
+            <h1>{showAttributes.title}</h1>
+            <p>{showAttributes.description}</p>
 
-      <Img
-        fluid={show.image.childImageSharp.fluid}
-        style={{ width: '260px' }}
-      />
+            <Img
+              fluid={show.image.childImageSharp.fluid}
+              style={{ width: '260px' }}
+            />
+            <p>Copyright: {showAttributes.copyright}</p>
+            <p>{showAttributes.category}</p>
+            <hr />
 
-      <hr />
-
-      {show.episodes.map(episode => (
-        <article key={episode.id}>
-          <Img
-            fluid={episode.image.childImageSharp.fluid}
-            style={{ width: '260px' }}
-          />
-          <h2>{episode.title}</h2>
-          <p>{episode.content}</p>
-          <ReactAudioPlayer
-            src={episode.enclosure.url}
-            controls
-            preload="none"
-          />
-        </article>
-      ))}
+            {relationships.episodes.data.map((showEpisode) => {
+              const episode = episodes.nodes.find(
+                (ep) => ep.attributes.id === showEpisode.id
+              );
+              return episode ? (
+                <article key={episode.id}>
+                  <h2>{episode.attributes.title}</h2>
+                  <p>{episode.attributes.formatted_summary}</p>
+                  <ReactAudioPlayer
+                    src={episode.attributes.media_url}
+                    controls
+                    preload="none"
+                  />
+                </article>
+              ) : null;
+            })}
+          </React.Fragment>
+        );
+      })}
     </React.Fragment>
   );
 };
