@@ -1,4 +1,5 @@
 const axios = require('axios').default;
+const Parser = require('rss-parser');
 const { createRemoteFileNode } = require('gatsby-source-filesystem');
 
 exports.sourceNodes = async (
@@ -10,6 +11,9 @@ exports.sourceNodes = async (
       'gatsby-source-transistorfm: You must provide an apiKey for your feed'
     );
 
+  /**
+   * Handle get requests
+   */
   const apiBase = 'https://api.transistor.fm/v1';
   const createGetRequest = async (path, params) => {
     return await axios.get(`${apiBase}${path}`, {
@@ -89,6 +93,9 @@ exports.sourceNodes = async (
   const shows = await getShows();
   const allEpisodes = await getAllEpisodes();
 
+  /**
+   * Gatsby processes
+   */
   const processEpisode = async ({ episode }) => {
     const { id, attributes } = episode;
     await createNode({
@@ -106,9 +113,14 @@ exports.sourceNodes = async (
   };
 
   const processShow = async ({ show }) => {
+    const { id, attributes } = show;
     await createNode({
       ...show,
-      id: createNodeId(show.id),
+      id: createNodeId(id),
+      attributes: {
+        ...attributes,
+        id
+      },
       internal: {
         contentDigest: createContentDigest(show),
         type: `TransistorShow`,
@@ -122,6 +134,11 @@ exports.sourceNodes = async (
   ]);
 };
 
+
+/**
+ * 
+ * Handle show image
+ */
 exports.onCreateNode = async ({
   node,
   actions,
