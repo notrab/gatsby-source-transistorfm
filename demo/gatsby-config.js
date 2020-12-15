@@ -5,7 +5,7 @@ module.exports = {
     {
       resolve: 'gatsby-source-transistorfm',
       options: {
-        url: process.env.TRANSISTOR_URL,
+        apiKey: process.env.TRANSISTOR_API_KEY,
       },
     },
     'gatsby-plugin-sharp',

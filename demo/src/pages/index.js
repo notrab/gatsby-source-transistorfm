@@ -7,22 +7,28 @@ const pageQuery = graphql`
   {
     show: transistorShow {
       id
-      title
-      description
-      episodes {
-        id
+      attributes {
         title
-        content
-        enclosure {
-          url
-        }
-        image {
-          childImageSharp {
-            fluid(maxWidth: 560) {
-              ...GatsbyImageSharpFluid
-            }
-          }
-        }
+        author
+        category
+        copyright
+        created_at
+        description
+        image_url
+        keywords
+        language
+        multiple_seasons
+        owner_email
+        password_protected_feed
+        playlist_limit
+        private
+        secondary_category
+        show_type
+        slug
+        spotify
+        time_zone
+        website
+        updated_at
       }
       image {
         childImageSharp {
@@ -31,17 +37,26 @@ const pageQuery = graphql`
           }
         }
       }
+      episodes {
+        id
+        attributes {
+          formatted_summary
+          media_url
+          title
+        }
+      }
     }
   }
 `;
 
 const IndexPage = () => {
   const { show } = useStaticQuery(pageQuery);
+  const {attributes, episodes} = show;
 
   return (
     <React.Fragment>
-      <h1>{show.title}</h1>
-      <p>{show.description}</p>
+      <h1>{attributes.title}</h1>
+      <p>{attributes.description}</p>
 
       <Img
         fluid={show.image.childImageSharp.fluid}
@@ -50,16 +65,16 @@ const IndexPage = () => {
 
       <hr />
 
-      {show.episodes.map(episode => (
+      {episodes.map((episode) => (
         <article key={episode.id}>
-          <Img
+          {/* <Img
             fluid={episode.image.childImageSharp.fluid}
             style={{ width: '260px' }}
-          />
-          <h2>{episode.title}</h2>
-          <p>{episode.content}</p>
+          /> */}
+          <h2>{episode.attributes.title}</h2>
+          <p>{episode.attributes.formatted_summary}</p>
           <ReactAudioPlayer
-            src={episode.enclosure.url}
+            src={episode.attributes.media_url}
             controls
             preload="none"
           />
