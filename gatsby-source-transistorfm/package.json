@@ -11,7 +11,11 @@
     "podcast"
   ],
   "dependencies": {
+    "axios": "^0.21.0",
     "gatsby-source-filesystem": "2.7.0",
     "rss-parser": "3.10.0"
+  },
+  "scripts": {
+    "tester": "node -e 'require(\"./test\").test(\"3sa_YuuCfr7ELDWU40rXcQ\")'"
   }
 }
