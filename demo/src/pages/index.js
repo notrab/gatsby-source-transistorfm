@@ -37,12 +37,26 @@ const pageQuery = graphql`
           }
         }
       }
-      episodes {
-        id
-        attributes {
-          formatted_summary
-          media_url
-          title
+      relationships {
+        episodes {
+          data {
+            id
+          }
+        }
+      }
+    }
+    episodes: allTransistorEpisode {
+      edges {
+        node {
+          id
+          attributes {
+            id
+            formatted_summary
+            media_url
+            number
+            season
+            title
+          }
         }
       }
     }
@@ -50,13 +64,13 @@ const pageQuery = graphql`
 `;
 
 const IndexPage = () => {
-  const { show } = useStaticQuery(pageQuery);
-  const {attributes, episodes} = show;
+  const { show, episodes } = useStaticQuery(pageQuery);
+  const { attributes: showAttributes, relationships } = show;
 
   return (
     <React.Fragment>
-      <h1>{attributes.title}</h1>
-      <p>{attributes.description}</p>
+      <h1>{showAttributes.title}</h1>
+      <p>{showAttributes.description}</p>
 
       <Img
         fluid={show.image.childImageSharp.fluid}
@@ -65,21 +79,20 @@ const IndexPage = () => {
 
       <hr />
 
-      {episodes.map((episode) => (
-        <article key={episode.id}>
-          {/* <Img
-            fluid={episode.image.childImageSharp.fluid}
-            style={{ width: '260px' }}
-          /> */}
-          <h2>{episode.attributes.title}</h2>
-          <p>{episode.attributes.formatted_summary}</p>
-          <ReactAudioPlayer
-            src={episode.attributes.media_url}
-            controls
-            preload="none"
-          />
-        </article>
-      ))}
+      {relationships.episodes.data.map((showEpisode) => {
+        const episode = episodes.edges.find(ep => ep.node.attributes.id === showEpisode.id);
+        return episode ? (
+          <article key={episode.node.id}>
+            <h2>{episode.node.attributes.title}</h2>
+            <p>{episode.node.attributes.formatted_summary}</p>
+            <ReactAudioPlayer
+              src={episode.node.attributes.media_url}
+              controls
+              preload="none"
+            />
+          </article>
+        ) : null;
+      })}
     </React.Fragment>
   );
 };

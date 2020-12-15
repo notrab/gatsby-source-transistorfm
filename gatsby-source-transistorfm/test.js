@@ -72,6 +72,5 @@ module.exports.test = async function (apiKey) {
   };
 
   await processAllEpisodes();
-  console.log(nodes.length)
   
 };
