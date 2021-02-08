@@ -12,6 +12,6 @@
   ],
   "dependencies": {
     "gatsby-source-filesystem": "2.10.0",
-    "rss-parser": "3.10.0"
+    "rss-parser": "3.11.0"
   }
 }
